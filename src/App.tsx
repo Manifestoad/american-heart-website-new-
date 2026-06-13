@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import SparkingLogo from './components/SparkingLogo';
 import { 
   Play, 
   Pause, 
@@ -11,7 +12,6 @@ import {
   ChevronRight, 
   Volume2, 
   VolumeX, 
-  Sliders, 
   X, 
   BookOpen, 
   Sparkles, 
@@ -20,7 +20,12 @@ import {
   Repeat, 
   Shuffle,
   Compass,
-  FileText
+  FileText,
+  Twitter,
+  Facebook,
+  Share2,
+  Link,
+  Check
 } from 'lucide-react';
 
 declare global {
@@ -244,6 +249,23 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+
+  const [shareUrl, setShareUrl] = useState("https://bobkelin.com");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Use the current custom domain or window origin
+      setShareUrl("https://bobkelin.com");
+    }
+  }, []);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText("https://bobkelin.com").then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {});
+  };
 
   // Advanced Stateful Audio Player States
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
@@ -566,16 +588,44 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#060b1c] text-[#fdfbf7] font-sans selection:bg-[#dfa659] selection:text-[#060b1c]">
       
+      {/* Floating Share Side deck (Desktop) */}
+      <div className="hidden lg:flex flex-col gap-3.5 fixed left-6 top-1/2 -translate-y-1/2 z-50 bg-[#0b1224]/80 border border-white/5 backdrop-blur-md p-3 rounded-full shadow-2xl">
+        <a 
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+          target="_blank" 
+          rel="noopener noreferrer"
+          title="Share on Facebook"
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-white/[0.03] hover:bg-[#dfa659] text-white/75 hover:text-[#060b1c] transition-all duration-300"
+        >
+          <Facebook size={16} />
+        </a>
+        <a 
+          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent("Listen to Bob Kelin's amazing new album, American Heart!")}`}
+          target="_blank" 
+          rel="noopener noreferrer"
+          title="Share on X / Twitter"
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-white/[0.03] hover:bg-[#dfa659] text-white/75 hover:text-[#060b1c] transition-all duration-300"
+        >
+          <Twitter size={16} />
+        </a>
+        <button 
+          onClick={handleCopyLink}
+          title="Copy Link"
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-white/[0.03] hover:bg-[#dfa659] text-white/75 hover:text-[#060b1c] transition-all duration-300 cursor-pointer"
+        >
+          {copied ? <Check size={16} className="text-emerald-500" /> : <Link size={16} />}
+        </button>
+      </div>
+      
       {/* Navbar */}
       <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-[#060b1c]/95 backdrop-blur-xl py-4 border-b border-white/5 shadow-2xl' : 'bg-transparent py-8'}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <motion.a 
+          <a 
             href="#" 
-            className="font-script text-4xl text-[#dfa659] hover:scale-105 transition-transform"
-            whileHover={{ rotate: -2 }}
+            className="hover:scale-105 transition-transform flex items-center"
           >
-            Bob Kelin
-          </motion.a>
+            <SparkingLogo text="Bob Kelin" className="font-script text-4xl text-[#dfa659]" />
+          </a>
           
           <div className="flex items-center gap-8">
             <div className="hidden md:flex gap-10 text-[10px] uppercase tracking-[0.3em] font-bold">
@@ -605,9 +655,13 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, ease: "easeOut" }}
           >
-            <span className="text-[10px] uppercase tracking-[0.5em] text-[#dfa659] mb-6 block font-bold">Oklahoma's Own</span>
-            <h1 className="font-script text-8xl md:text-[12rem] text-[#dfa659] drop-shadow-[0_10px_20px_rgba(0,0,0,0.7)] leading-none mb-4">
-              Bob Kelin
+            <span className="text-[10px] uppercase tracking-[0.5em] text-[#dfa659] mb-4 block font-bold">Oklahoma's Own</span>
+            <h1 className="drop-shadow-[0_10px_20px_rgba(0,0,0,0.7)] leading-none mb-4">
+              <SparkingLogo 
+                text="Bob Kelin" 
+                className="font-script text-8xl md:text-[11rem] text-[#dfa659]" 
+                isHero={true} 
+              />
             </h1>
           </motion.div>
           <motion.p
@@ -779,6 +833,40 @@ export default function App() {
                 })}
               </div>
             </div>
+
+            {/* Share This Album Widget */}
+            <div className="mt-8 pt-6 border-t border-white/5">
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#dfa659] font-black flex items-center gap-2 mb-4">
+                <Share2 size={12} /> SHARE THIS ALBUM
+              </span>
+              <div className="flex flex-wrap gap-3">
+                <a 
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-white/[0.03] border border-white/10 hover:border-[#dfa659]/30 hover:bg-[#dfa659]/10 text-white/85 hover:text-[#dfa659] px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
+                >
+                  <Facebook size={14} />
+                  <span>Facebook</span>
+                </a>
+                <a 
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent("Check out Bob Kelin's amazing new album, American Heart!")}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-white/[0.03] border border-white/10 hover:border-[#dfa659]/30 hover:bg-[#dfa659]/10 text-white/85 hover:text-[#dfa659] px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
+                >
+                  <Twitter size={14} />
+                  <span>X / Twitter</span>
+                </a>
+                <button 
+                  onClick={handleCopyLink}
+                  className="flex items-center gap-2 bg-white/[0.03] border border-white/10 hover:border-[#dfa659]/30 hover:bg-[#dfa659]/10 text-white/85 hover:text-[#dfa659] px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                >
+                  {copied ? <Check size={14} className="text-emerald-500" /> : <Link size={14} />}
+                  <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -815,9 +903,10 @@ export default function App() {
       <section id="about" className="py-32 px-6 max-w-7xl mx-auto relative">
         <div className="grid lg:grid-cols-2 gap-24 items-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, y: 60, scale: 0.96 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
             className="order-2 lg:order-1"
           >
             <div className="relative w-full aspect-square rounded-3xl p-8 bg-[#0b1224] border border-white/5 shadow-2xl overflow-hidden flex flex-col justify-between cursor-default select-none">
@@ -868,9 +957,10 @@ export default function App() {
           </motion.div>
           
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, y: 60 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 1.0, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className="order-1 lg:order-2"
           >
             <Music className="text-[#dfa659] mb-8" size={48} strokeWidth={1} />
@@ -1082,11 +1172,22 @@ export default function App() {
             <div>
               <h4 className="text-[10px] uppercase tracking-[0.4em] font-black text-[#dfa659] mb-8">Follow</h4>
               <div className="flex flex-wrap gap-4">
-                {[Instagram, Youtube].map((Icon, i) => (
-                  <a key={i} href="#" className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#dfa659] hover:text-[#060b1c] transition-all duration-300">
-                    <Icon size={18} />
-                  </a>
-                ))}
+                <a 
+                  href="https://www.instagram.com/okbbob1" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#dfa659] hover:text-[#060b1c] transition-all duration-300"
+                >
+                  <Instagram size={18} />
+                </a>
+                <a 
+                  href="https://www.youtube.com/@okbbob1" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#dfa659] hover:text-[#060b1c] transition-all duration-300"
+                >
+                  <Youtube size={18} />
+                </a>
               </div>
             </div>
           </div>
